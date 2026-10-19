@@ -11,6 +11,7 @@ const branchSchema = new mongoose.Schema({
   closingTime: { type: String, default: '23:00' },
   kitchenSystemEnabled: { type: Boolean, default: true },
   barmanSystemEnabled: { type: Boolean, default: true },
+  barPrinterEnabled:   { type: Boolean, default: false },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Branch', branchSchema);

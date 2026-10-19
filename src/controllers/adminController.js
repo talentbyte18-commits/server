@@ -1234,7 +1234,7 @@ exports.getSystemSettings = async (req, res) => {
   try {
     const { branchId } = req.params;
     const branch = await Branch.findById(branchId)
-      .select('name kitchenSystemEnabled barmanSystemEnabled');
+      .select('name kitchenSystemEnabled barmanSystemEnabled barPrinterEnabled');
     if (!branch)
       return res.status(404).json({ success: false, message: 'Branch not found' });
 
@@ -1245,6 +1245,7 @@ exports.getSystemSettings = async (req, res) => {
         branchName:            branch.name,
         kitchenSystemEnabled:  branch.kitchenSystemEnabled !== false,
         barmanSystemEnabled:   branch.barmanSystemEnabled  !== false,
+        barPrinterEnabled:     branch.barPrinterEnabled === true,   // ✅ NEW
       },
     });
   } catch (error) {
@@ -1255,19 +1256,21 @@ exports.getSystemSettings = async (req, res) => {
 exports.updateSystemSettings = async (req, res) => {
   try {
     const { branchId } = req.params;
-    const { kitchenSystemEnabled, barmanSystemEnabled } = req.body;
+    const { kitchenSystemEnabled, barmanSystemEnabled, barPrinterEnabled } = req.body; // ✅
 
     const updateData = {};
     if (kitchenSystemEnabled !== undefined)
       updateData.kitchenSystemEnabled = Boolean(kitchenSystemEnabled);
     if (barmanSystemEnabled !== undefined)
       updateData.barmanSystemEnabled  = Boolean(barmanSystemEnabled);
+    if (barPrinterEnabled !== undefined)                              // ✅ NEW
+      updateData.barPrinterEnabled    = Boolean(barPrinterEnabled);
 
     const branch = await Branch.findByIdAndUpdate(
       branchId,
       { $set: updateData },
       { new: true }
-    ).select('name kitchenSystemEnabled barmanSystemEnabled');
+    ).select('name kitchenSystemEnabled barmanSystemEnabled barPrinterEnabled'); // ✅
 
     if (!branch)
       return res.status(404).json({ success: false, message: 'Branch not found' });
@@ -1280,6 +1283,7 @@ exports.updateSystemSettings = async (req, res) => {
         branchName:            branch.name,
         kitchenSystemEnabled:  branch.kitchenSystemEnabled !== false,
         barmanSystemEnabled:   branch.barmanSystemEnabled  !== false,
+        barPrinterEnabled:     branch.barPrinterEnabled === true,   // ✅ NEW
       },
     });
   } catch (error) {

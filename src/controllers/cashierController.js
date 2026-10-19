@@ -12,6 +12,7 @@ const { PaymentStatus } = require('../config/constants');
 const { generateOrderNumber, calculateTotalTime, calculateOrderTotal } = require('../utils/helpers');
 const { getSystemSettings } = require('../utils/systemSettings');
 const { deductFoodIngredientsForOrder, deductColdDrinksForOrder } = require('../utils/inventoryDeduction');
+const Branch = require('../models/Branch');
 
 
 const BRANCH_NAME = 'Al Madina Fast Food Shahkot';
@@ -1530,7 +1531,15 @@ exports.getCashierSystemInfo = async (req, res) => {
   try {
     const { getSystemSettings } = require('../utils/systemSettings');
     const settings = await getSystemSettings(req.user.branchId);
-    res.json({ success: true, ...settings });
+    const branch = await Branch.findById(req.user.branchId)
+      .select('barPrinterEnabled')
+      .lean();
+
+    res.json({
+      success: true,
+      ...settings,
+      barPrinterEnabled: branch?.barPrinterEnabled === true,   // ✅ NEW
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
